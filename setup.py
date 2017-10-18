@@ -20,7 +20,7 @@ setup(
     maintainer_email='marceloduartetrevisani@gmail.com',
     license='MIT',
     url='https://github.com/marcelotrevisani/pytest-vtk',
-    description='It's a plugin for pytest to easily test the VTK objects from VTK library',
+    description='Pytest plugin to easily test the VTK objects from VTK library',
     long_description=read('README.rst'),
     py_modules=['pytest_vtk'],
     install_requires=['pytest>=3.1.1'],
