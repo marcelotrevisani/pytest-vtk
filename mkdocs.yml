@@ -1,0 +1,10 @@
+site_name: pytest-vtk
+site_description: It's a plugin for pytest to easily test the VTK objects from VTK library
+site_author: Marcelo Duarte Trevisani
+
+theme: readthedocs
+
+repo_url: https://github.com/marcelotrevisani/pytest-vtk
+
+pages:
+- Home: index.md
