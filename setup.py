@@ -13,6 +13,7 @@ def read(fname):
 
 setup(
     name='pytest-vtk',
+    packages='pytestvtk',
     version='0.1.0',
     author='Marcelo Duarte Trevisani',
     author_email='marceloduartetrevisani@gmail.com',
@@ -21,8 +22,8 @@ setup(
     license='MIT',
     url='https://github.com/marcelotrevisani/pytest-vtk',
     description='Pytest plugin to easily test the VTK objects from VTK library',
+    keywords="pytest test vtk unittest",
     long_description=read('README.rst'),
-    py_modules=['pytest_vtk'],
     install_requires=['pytest>=3.1.1'],
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -43,7 +44,7 @@ setup(
     ],
     entry_points={
         'pytest11': [
-            'vtk = pytest_vtk',
+            'pytest-vtk = pytestvtk',
         ],
     },
 )
