@@ -66,12 +66,13 @@ You can install "pytest-vtk" via `pip`_ from `PyPI`_::
 
 Usage
 -----
-Just call the ```compare_vtk``` function and pass two VTK objects which will be compared. 
+Just call the ``compare_vtk`` function and pass two VTK objects which will be compared. 
 
 Example:
-```python
+
+``python
 compare_vtk(vtk_object1, vtk_object2)
-```
+``
 
 The pytest-vtl plugin will raise an error if these two objects are different and also will show the differences.
 
