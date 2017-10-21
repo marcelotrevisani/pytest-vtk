@@ -3,21 +3,19 @@ import vtk
 
 from pytestvtk.compare_vtk import compare_vtk
 
-list_vtk_array = [
-                    vtk.vtkDoubleArray(),
-                    vtk.vtkFloatArray(),
-                    vtk.vtkIntArray(),
-                    vtk.vtkIdTypeArray(),
-                    vtk.vtkLongArray(),
-                    vtk.vtkShortArray(),
-                    vtk.vtkUnsignedCharArray(),
-                    vtk.vtkUnsignedIntArray(),
-                    vtk.vtkUnsignedLongArray(),
-                    vtk.vtkUnsignedLongLongArray(),
-                    vtk.vtkUnsignedShortArray(),
-                ]
-
-@pytest.fixture(params=list_vtk_array)
+@pytest.fixture(params=[
+                            vtk.vtkDoubleArray(),
+                            vtk.vtkFloatArray(),
+                            vtk.vtkIntArray(),
+                            vtk.vtkIdTypeArray(),
+                            vtk.vtkLongArray(),
+                            vtk.vtkShortArray(),
+                            vtk.vtkUnsignedCharArray(),
+                            vtk.vtkUnsignedIntArray(),
+                            vtk.vtkUnsignedLongArray(),
+                            vtk.vtkUnsignedLongLongArray(),
+                            vtk.vtkUnsignedShortArray(),
+                         ])
 def vtk_array(request):
     array = request.param
     array.SetName('testing_array')
@@ -29,7 +27,19 @@ def vtk_array(request):
     return array
 
 
-@pytest.fixture(params=list_vtk_array)
+@pytest.fixture(params=[
+                            vtk.vtkDoubleArray(),
+                            vtk.vtkFloatArray(),
+                            vtk.vtkIntArray(),
+                            vtk.vtkIdTypeArray(),
+                            vtk.vtkLongArray(),
+                            vtk.vtkShortArray(),
+                            vtk.vtkUnsignedCharArray(),
+                            vtk.vtkUnsignedIntArray(),
+                            vtk.vtkUnsignedLongArray(),
+                            vtk.vtkUnsignedLongLongArray(),
+                            vtk.vtkUnsignedShortArray(),
+                        ])
 def vtk_array_mod(request):
     array = request.param
     array.SetName('testing_array_modified')
@@ -45,8 +55,9 @@ def vtk_array_mod(request):
 def test_compare_vtkDataArray(vtk_array):
     compare_vtk(vtk_array, vtk_array)
 
-# def test_compare_vtkDataArray_fail(vtk_array, vtk_array_mod):
-#     compare_vtk(vtk_array, vtk_array_mod)
+def test_compare_vtkDataArray_fail(vtk_array, vtk_array_mod):
+    with pytest.raises(pytest.fail.Exception) as excinfo:
+        compare_vtk(vtk_array, vtk_array_mod)
 
 
 

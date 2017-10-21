@@ -11,21 +11,26 @@ def compare_vtk(vtk_expect, vtk_compare):
     :param vtk_compare: Receives the VTK object which will be compared
     :return: True if the objects have the same values and False otherwise
     '''
+    list_errors = []
     if isinstance(vtk_compare, vtk.vtkStructuredGrid) and isinstance(vtk_expect, vtk.vtkStructuredGrid):
-        compare_vtkStructuredGrid(vtk_expect, vtk_compare)
+        list_errors = compare_vtkStructuredGrid(vtk_expect, vtk_compare)
     elif isinstance(vtk_compare, vtk.vtkUnstructuredGrid) and isinstance(vtk_expect, vtk.vtkUnstructuredGrid):
         pass
     elif isinstance(vtk_compare, vtk.vtkPolyData) and isinstance(vtk_expect, vtk.vtkPolyData):
         pass
     elif isinstance(vtk_compare, vtk.vtkDataArray) and isinstance(vtk_expect, vtk.vtkDataArray):
-        compare_vtkDataArray(vtk_expect, vtk_compare)
+        list_errors = _compare_vtkDataArray(vtk_expect, vtk_compare)
+
+    if list_errors:
+        pytest.fail('\n\n'.join(list_errors))
 
 
-def compare_vtkDataArray(vtk_expect, vtk_compare):
+def _compare_vtkDataArray(vtk_expect, vtk_compare):
     '''
     Compare if the two vtkDataArray object are equal
     :param vtk_expect: vtkDataArray
     :param vtk_compare: vtkDataArray
+    :return string list: Return a list regarding the errors found
     '''
     list_errors = []
 
@@ -55,9 +60,7 @@ def compare_vtkDataArray(vtk_expect, vtk_compare):
             nt.assert_array_equal(np_expect, np_compare)
         except AssertionError as msg:
             list_errors.append('The vtkDataArray received are not equal.\n{}'.format(msg.message))
-
-    if list_errors:
-        pytest.fail('\n\n'.join(list_errors))
+    return list_errors
 
 
 def _get_vtk_type(value):
@@ -71,13 +74,13 @@ def _get_vtk_type(value):
              0 : 'VTK_VOID',
              1 : 'VTK_BIT',
              2 : 'VTK_CHAR',
-             3: 'VTK_UNSIGNED_CHAR',
-             4: 'VTK_SHORT',
-             5: 'VTK_UNSIGNED_SHORT',
-             6: 'VTK_INT',
-             7: 'VTK_UNSIGNED_INT',
-             8: 'VTK_LONG',
-             9: 'VTK_UNSIGNED_LONG',
+             3 : 'VTK_UNSIGNED_CHAR',
+             4 : 'VTK_SHORT',
+             5 : 'VTK_UNSIGNED_SHORT',
+             6 : 'VTK_INT',
+             7 : 'VTK_UNSIGNED_INT',
+             8 : 'VTK_LONG',
+             9 : 'VTK_UNSIGNED_LONG',
              10: 'VTK_FLOAT',
              11: 'VTK_DOUBLE',
              12: 'VTK_ID_TYPE',
@@ -105,6 +108,8 @@ def compare_vtkStructuredGrid(vtk_expect, vtk_compare):
     :param vtk_expect: vtkStructuredGrid expected
     :param vtk_compare: vtkStructuredGrid to compare
     '''
+    list_errors = []
+
     exp_points = ns.vtk_to_numpy(vtk_expect.GetPoints().GetData())
     exp_scalars = ns.vtk_to_numpy(vtk_expect.GetPointData().GetScalars())
     exp_ghost = None
@@ -118,6 +123,12 @@ def compare_vtkStructuredGrid(vtk_expect, vtk_compare):
 
     if vtk_compare.GetPointGhostArray():
         cmp_ghost = ns.vtk_to_numpy(vtk_compare.GetPointGhostArray())
+
+
+    if not(cmp_ghost is None or exp_ghost is None):
+        aux_erros = _compare_vtkDataArray(exp_ghost, cmp_ghost)
+        if aux_erros:
+            list_errors.append(aux_erros)
 
     if vtk_expect.GetNumberOfPoints() != vtk_compare.GetNumberOfPoints():
         list_errors.append('The number of points are different. Expected: {}, received: '
@@ -158,6 +169,6 @@ def compare_vtkStructuredGrid(vtk_expect, vtk_compare):
     try:
         nt.assert_array_equal(exp_ghost, cmp_ghost)
     except AssertionError as msg:
-        list_errors.append('The vtkStructuredGrid ghost compared are not equal. \n'
+        list_errors.append('The vtkStructuredGrid ghost array compared are not equal. \n'
                            '{}'.format(msg.message))
 
