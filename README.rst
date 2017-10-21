@@ -70,9 +70,7 @@ Just call the ``compare_vtk`` function and pass two VTK objects which will be co
 
 Example:
 
-``python
-compare_vtk(vtk_object1, vtk_object2)
-``
+``compare_vtk(vtk_object1, vtk_object2)``
 
 The pytest-vtl plugin will raise an error if these two objects are different and also will show the differences.
 
