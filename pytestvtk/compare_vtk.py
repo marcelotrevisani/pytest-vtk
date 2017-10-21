@@ -13,11 +13,13 @@ def compare_vtk(vtk_expect, vtk_compare):
     '''
     list_errors = []
     if isinstance(vtk_compare, vtk.vtkStructuredGrid) and isinstance(vtk_expect, vtk.vtkStructuredGrid):
-        list_errors = compare_vtkStructuredGrid(vtk_expect, vtk_compare)
+        list_errors = _compare_vtkStructuredGrid(vtk_expect, vtk_compare)
     elif isinstance(vtk_compare, vtk.vtkUnstructuredGrid) and isinstance(vtk_expect, vtk.vtkUnstructuredGrid):
         pass
     elif isinstance(vtk_compare, vtk.vtkPolyData) and isinstance(vtk_expect, vtk.vtkPolyData):
         pass
+    elif isinstance(vtk_compare, vtk.vtkPoints) and isinstance(vtk_expect, vtk.vtkPoints):
+        list_errors = _compre_vtkPoints(vtk_expect, vtk_compare)
     elif isinstance(vtk_compare, vtk.vtkDataArray) and isinstance(vtk_expect, vtk.vtkDataArray):
         list_errors = _compare_vtkDataArray(vtk_expect, vtk_compare)
 
@@ -102,7 +104,7 @@ def _get_vtk_type(value):
         raise ValueError('The type data received is not valid. Value: {}'.format())
 
 
-def compare_vtkStructuredGrid(vtk_expect, vtk_compare):
+def _compare_vtkStructuredGrid(vtk_expect, vtk_compare):
     '''
     Receives two vtkStructuredGrid and compare if they are equal.
     :param vtk_expect: vtkStructuredGrid expected
@@ -162,13 +164,27 @@ def compare_vtkStructuredGrid(vtk_expect, vtk_compare):
 
     if not (exp_ghost is None and cmp_ghost is None) and \
             vtk_expect.GetPointGhostArray().GetName() != vtk_compare.GetPointGhostArray().GetName():
-        list_errors.append('The name of the ghost data structure  are different. '
+        list_errors.append('The name of the ghost data structure are different. '
                            'Expected: {} , Received: {}'.format(vtk_expect.GetPointGhostArray().GetName(),
                                                                 vtk_compare.GetPointGhostArray().GetName()))
-
     try:
         nt.assert_array_equal(exp_ghost, cmp_ghost)
     except AssertionError as msg:
         list_errors.append('The vtkStructuredGrid ghost array compared are not equal. \n'
                            '{}'.format(msg.message))
 
+    return list_errors
+
+
+def _compre_vtkPoints(vtk_exp, vtk_cmp):
+    list_errors = _compare_vtkDataArray(vtk_exp.GetData(), vtk_cmp.GetData())
+
+    if vtk_exp.GetNumberOfPoints() != vtk_cmp.GetNumberOfPoints():
+        list_errors.append('The number of points of the vtkPoints are different. Expected: {}, received: {}'.format(
+                                                      vtk_exp.GetNumberOfPoints(), vtk_cmp.GetNumberOfPoints()))
+    vtk_exp.ComputeBounds()
+    vtk_cmp.ComputeBounds()
+    if vtk_exp.GetBounds() != vtk_cmp.GetBounds():
+        list_errors.append('The bounds of the vtkPoints are different. Expected: {}, received: {}'.format(vtk_exp.GetBounds(),
+                                                                                                   vtk_cmp.GetBounds()))
+    return list_errors
