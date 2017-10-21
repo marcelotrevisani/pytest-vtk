@@ -20,18 +20,20 @@ This `Pytest`_ plugin was generated with `Cookiecutter`_ along with `@hackebrot`
 Features
 --------
 
-* Support for testing vtkDataArray objects such as:
-    * vtkDoubleArray
-    * vtkFloatArray
-    * vtkIntArray
-    * vtkIdTypeArray
-    * vtkLongArray
-    * vtkShortArray
-    * vtkUnsignedCharArray
-    * vtkUnsignedIntArray
-    * vtkUnsignedLongArray
-    * vtkUnsignedLongLongArray
-    * vtkUnsignedShortArray
+Support for testing vtk objects such as:
+
+* vtkDoubleArray
+* vtkFloatArray
+* vtkIntArray
+* vtkIdTypeArray
+* vtkLongArray
+* vtkShortArray
+* vtkUnsignedCharArray
+* vtkUnsignedIntArray
+* vtkUnsignedLongArray
+* vtkUnsignedLongLongArray
+* vtkUnsignedShortArray
+* vtkPoints
 
 
 To Do
@@ -67,8 +69,13 @@ You can install "pytest-vtk" via `pip`_ from `PyPI`_::
 
 Usage
 -----
+Just call the ``assert_vtk`` function and pass two VTK objects which will be compared.
 
-* TODO
+Example:
+
+``assert_vtk(vtk_object1, vtk_object2)``
+
+The pytest-vtl plugin will raise an error if these two objects are different and also will show the differences.
 
 Contributing
 ------------

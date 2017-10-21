@@ -3,7 +3,7 @@ import pytest
 import vtk
 from vtk.util import numpy_support as ns
 
-from pytestvtk.compare_vtk import compare_vtk
+from pytestvtk.assert_vtk import assert_vtk
 
 
 @pytest.fixture
@@ -27,8 +27,8 @@ def vtk_points_mod():
     return result
 
 def test_compare_vtkPoints(vtk_points):
-    compare_vtk(vtk_points, vtk_points)
+    assert_vtk(vtk_points, vtk_points)
 
 def test_compare_vtkPoints_fail(vtk_points, vtk_points_mod):
     with pytest.raises(pytest.fail.Exception) as excinfo:
-        compare_vtk(vtk_points, vtk_points_mod)
+        assert_vtk(vtk_points, vtk_points_mod)

@@ -1,7 +1,7 @@
 import pytest
 import vtk
 
-from pytestvtk.compare_vtk import compare_vtk
+from pytestvtk.assert_vtk import assert_vtk
 
 @pytest.fixture(params=[
                             vtk.vtkDoubleArray(),
@@ -53,11 +53,11 @@ def vtk_array_mod(request):
 
 
 def test_compare_vtkDataArray(vtk_array):
-    compare_vtk(vtk_array, vtk_array)
+    assert_vtk(vtk_array, vtk_array)
 
 def test_compare_vtkDataArray_fail(vtk_array, vtk_array_mod):
     with pytest.raises(pytest.fail.Exception) as excinfo:
-        compare_vtk(vtk_array, vtk_array_mod)
+        assert_vtk(vtk_array, vtk_array_mod)
 
 
 

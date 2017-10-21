@@ -2,7 +2,7 @@ import pytest
 import vtk
 import numpy as np
 from vtk.util import numpy_support as ns
-from pytestvtk.compare_vtk import compare_vtk
+from pytestvtk.assert_vtk import assert_vtk
 
 
 @pytest.fixture
@@ -14,4 +14,4 @@ def vtk_grid():
     array_points.SetName('test_points')
     points.SetData(array_points)
     result.SetPoints(points)
-    result.Set
+    # WIP

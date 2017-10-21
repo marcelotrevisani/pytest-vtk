@@ -4,7 +4,7 @@ import vtk
 from vtk.util import numpy_support as ns
 
 
-def compare_vtk(vtk_expect, vtk_compare):
+def assert_vtk(vtk_expect, vtk_compare):
     '''
     Test if two VTK objects are equal
     :param vtk_expect: Receives the VTK object expected
@@ -19,7 +19,7 @@ def compare_vtk(vtk_expect, vtk_compare):
     elif isinstance(vtk_compare, vtk.vtkPolyData) and isinstance(vtk_expect, vtk.vtkPolyData):
         pass
     elif isinstance(vtk_compare, vtk.vtkPoints) and isinstance(vtk_expect, vtk.vtkPoints):
-        list_errors = _compre_vtkPoints(vtk_expect, vtk_compare)
+        list_errors = _compare_vtkPoints(vtk_expect, vtk_compare)
     elif isinstance(vtk_compare, vtk.vtkDataArray) and isinstance(vtk_expect, vtk.vtkDataArray):
         list_errors = _compare_vtkDataArray(vtk_expect, vtk_compare)
 
@@ -176,7 +176,7 @@ def _compare_vtkStructuredGrid(vtk_expect, vtk_compare):
     return list_errors
 
 
-def _compre_vtkPoints(vtk_exp, vtk_cmp):
+def _compare_vtkPoints(vtk_exp, vtk_cmp):
     list_errors = _compare_vtkDataArray(vtk_exp.GetData(), vtk_cmp.GetData())
 
     if vtk_exp.GetNumberOfPoints() != vtk_cmp.GetNumberOfPoints():
@@ -185,6 +185,6 @@ def _compre_vtkPoints(vtk_exp, vtk_cmp):
     vtk_exp.ComputeBounds()
     vtk_cmp.ComputeBounds()
     if vtk_exp.GetBounds() != vtk_cmp.GetBounds():
-        list_errors.append('The bounds of the vtkPoints are different. Expected: {}, received: {}'.format(vtk_exp.GetBounds(),
-                                                                                                   vtk_cmp.GetBounds()))
+        list_errors.append('The bounds of the vtkPoints are different. Expected: {}, '
+                           'received: {}'.format(vtk_exp.GetBounds(), vtk_cmp.GetBounds()))
     return list_errors
