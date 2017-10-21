@@ -20,18 +20,45 @@ This `Pytest`_ plugin was generated with `Cookiecutter`_ along with `@hackebrot`
 Features
 --------
 
-* TODO
+* Support for testing vtkDataArray objects such as:
+    * vtkDoubleArray
+    * vtkFloatArray
+    * vtkIntArray
+    * vtkIdTypeArray
+    * vtkLongArray
+    * vtkShortArray
+    * vtkUnsignedCharArray
+    * vtkUnsignedIntArray
+    * vtkUnsignedLongArray
+    * vtkUnsignedLongLongArray
+    * vtkUnsignedShortArray
+
+
+To Do
+----
+* Support to test:
+    * vtkSignedCharArray
+    * vtkStructuredGrid
+    * vtkUnstructuredGrid
+    * vtkPolyData
+    * vtkImageData
+    * vtkRectilinearGrid
+* Support for image test
+* Add pytest-vtk package in conda-forge and also in Pypi
+
 
 
 Requirements
 ------------
 
-* TODO
+* vtk >= 7.0.0
+* numpy
+* pytest >= 3.1.1
 
 
 Installation
 ------------
-
+(Not implemented yet)
 You can install "pytest-vtk" via `pip`_ from `PyPI`_::
 
     $ pip install pytest-vtk
@@ -44,8 +71,7 @@ Usage
 
 Contributing
 ------------
-Contributions are very welcome. Tests can be run with `tox`_, please ensure
-the coverage at least stays the same before you submit a pull request.
+Contributions are very welcome.
 
 License
 -------
