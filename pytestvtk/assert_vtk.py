@@ -3,9 +3,11 @@ import vtk
 
 from pytestvtk._compare_vtkPointData import _compare_vtkPointData
 from pytestvtk._compare_vtkPoints import _compare_vtkPoints
+from pytestvtk.base_array._compare_vtkCellArray import _compare_vtkCellArray
 from pytestvtk.base_array._compare_vtkDataArray import _compare_vtkDataArray
 from pytestvtk.base_array._compare_vtkStringArray import _compare_vtkStringArray
 from pytestvtk.base_grids._compare_vtkStructuredGrid import _compare_vtkStructuredGrid
+from pytestvtk.base_grids._compare_vtkUnstructuredGrid import _compare_vtkUnstructuredGrid
 
 
 def assert_vtk(vtk_expect, vtk_compare):
@@ -19,9 +21,11 @@ def assert_vtk(vtk_expect, vtk_compare):
     if isinstance(vtk_compare, vtk.vtkStructuredGrid) and isinstance(vtk_expect, vtk.vtkStructuredGrid):
         list_errors = _compare_vtkStructuredGrid(vtk_expect, vtk_compare)
     elif isinstance(vtk_compare, vtk.vtkUnstructuredGrid) and isinstance(vtk_expect, vtk.vtkUnstructuredGrid):
-        pass
+        _compare_vtkUnstructuredGrid(vtk_expect, vtk_compare)
     elif isinstance(vtk_compare, vtk.vtkPolyData) and isinstance(vtk_expect, vtk.vtkPolyData):
         pass
+    elif isinstance(vtk_compare, vtk.vtkCellArray) and isinstance(vtk_expect, vtk.vtkCellArray):
+        list_errors = _compare_vtkCellArray(vtk_expect, vtk_compare)
     elif isinstance(vtk_compare, vtk.vtkPoints) and isinstance(vtk_expect, vtk.vtkPoints):
         list_errors = _compare_vtkPoints(vtk_expect, vtk_compare)
     elif isinstance(vtk_compare, vtk.vtkPointData) and isinstance(vtk_expect, vtk.vtkPointData):
@@ -34,8 +38,10 @@ def assert_vtk(vtk_expect, vtk_compare):
         pass
     elif isinstance(vtk_compare, vtk.vtkDataArray) and isinstance(vtk_expect, vtk.vtkDataArray):
         list_errors = _compare_vtkDataArray(vtk_expect, vtk_compare)
+    else:
+        list_errors = ['Object not recognized. Expected a vtk Object (vtkStructuredGrid, vtkUnstructuredGrid, '
+                       'vtkPolyData, vtkPoints, vtkPointData, vtkStringArray, vtkUnicodeStringArray, vtkVariantArray '
+                       ', vtkCellArray or vtkDataArray), received: {} and {}'.format(type(vtk_expect), type(vtk_compare))]
 
     if list_errors:
         pytest.fail('\n\n'.join(list_errors))
-
-
