@@ -24,7 +24,7 @@ setup(
     description='Pytest plugin to easily test the VTK objects from VTK library',
     keywords="pytest test vtk unittest",
     long_description=read('README.rst'),
-    install_requires=['pytest>=3.1.1', 'numpy'],
+    install_requires=['pytest>=3.1.1', 'numpy', 'vtk>=7.0.0'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Framework :: Pytest',
