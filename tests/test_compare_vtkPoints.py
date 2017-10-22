@@ -26,9 +26,7 @@ def vtk_points_mod():
     result.SetData(array)
     return result
 
-def test_compare_vtkPoints(vtk_points):
+def test_compare_vtkPoints(vtk_points, vtk_points_mod):
     assert_vtk(vtk_points, vtk_points)
-
-def test_compare_vtkPoints_fail(vtk_points, vtk_points_mod):
     with pytest.raises(pytest.fail.Exception) as excinfo:
         assert_vtk(vtk_points, vtk_points_mod)

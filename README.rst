@@ -34,6 +34,9 @@ Support for testing vtk objects such as:
 * vtkUnsignedLongLongArray
 * vtkUnsignedShortArray
 * vtkPoints
+* vtkPointData
+* vtkCharArray
+* vtkStringArray
 
 
 To Do
@@ -45,7 +48,9 @@ To Do
     * vtkPolyData
     * vtkImageData
     * vtkRectilinearGrid
-    * vtkPointData
+    * vtkUnicodeStringArray
+    * vtkVariantArray
+    * vtkBitArray
 * Support for image test
 * Add pytest-vtk package in conda-forge and also in Pypi
 

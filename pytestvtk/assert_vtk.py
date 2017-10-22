@@ -20,6 +20,14 @@ def assert_vtk(vtk_expect, vtk_compare):
         pass
     elif isinstance(vtk_compare, vtk.vtkPoints) and isinstance(vtk_expect, vtk.vtkPoints):
         list_errors = _compare_vtkPoints(vtk_expect, vtk_compare)
+    elif isinstance(vtk_compare, vtk.vtkPointData) and isinstance(vtk_expect, vtk.vtkPointData):
+        list_errors = _compare_vtkPointData(vtk_expect, vtk_compare)
+    elif isinstance(vtk_compare, vtk.vtkStringArray) and isinstance(vtk_expect, vtk.vtkStringArray):
+        list_errors = _compare_vtkStringArray(vtk_expect, vtk_compare)
+    elif isinstance(vtk_compare, vtk.vtkUnicodeStringArray) and isinstance(vtk_expect, vtk.vtkUnicodeStringArray):
+        pass
+    elif isinstance(vtk_compare, vtk.vtkVariantArray) and isinstance(vtk_expect, vtk.vtkVariantArray):
+        pass
     elif isinstance(vtk_compare, vtk.vtkDataArray) and isinstance(vtk_expect, vtk.vtkDataArray):
         list_errors = _compare_vtkDataArray(vtk_expect, vtk_compare)
 
@@ -53,6 +61,9 @@ def _compare_vtkDataArray(vtk_expect, vtk_compare):
 
     if isinstance(vtk_compare, vtk.vtkSignedCharArray):
         # vtkSignedCharArray does not support the conversion to numpy
+        pass
+    elif isinstance(vtk_compare, vtk.vtkBitArray):
+        # vtkBitArray does not support the conversion to numpy
         pass
     else:
         np_expect = ns.vtk_to_numpy(vtk_expect)
@@ -176,15 +187,149 @@ def _compare_vtkStructuredGrid(vtk_expect, vtk_compare):
     return list_errors
 
 
-def _compare_vtkPoints(vtk_exp, vtk_cmp):
-    list_errors = _compare_vtkDataArray(vtk_exp.GetData(), vtk_cmp.GetData())
+def _compare_vtkPoints(vtk_expect, vtk_compare):
+    '''
+    Verify if the two vtkPoints are equal
+    :param vtk_expect:
+    :param vtk_compare:
+    :return:
+    '''
+    list_errors = []
+    aux_errors = _compare_vtkDataArray(vtk_expect.GetData(), vtk_compare.GetData())
 
-    if vtk_exp.GetNumberOfPoints() != vtk_cmp.GetNumberOfPoints():
+    if aux_errors:
+        list_errors.append('The arrray points of vtkPoints are different.\n')
+        list_errors = list_errors + aux_errors
+
+    if vtk_expect.GetNumberOfPoints() != vtk_compare.GetNumberOfPoints():
         list_errors.append('The number of points of the vtkPoints are different. Expected: {}, received: {}'.format(
-                                                      vtk_exp.GetNumberOfPoints(), vtk_cmp.GetNumberOfPoints()))
-    vtk_exp.ComputeBounds()
-    vtk_cmp.ComputeBounds()
-    if vtk_exp.GetBounds() != vtk_cmp.GetBounds():
+                                                      vtk_expect.GetNumberOfPoints(), vtk_compare.GetNumberOfPoints()))
+    vtk_expect.ComputeBounds()
+    vtk_compare.ComputeBounds()
+    if vtk_expect.GetBounds() != vtk_compare.GetBounds():
         list_errors.append('The bounds of the vtkPoints are different. Expected: {}, '
-                           'received: {}'.format(vtk_exp.GetBounds(), vtk_cmp.GetBounds()))
+                           'received: {}'.format(vtk_expect.GetBounds(), vtk_compare.GetBounds()))
     return list_errors
+
+
+def _compare_vtkPointData(vtk_expect, vtk_compare):
+    '''
+    Compare two vtkPointData objects
+    :param vtk_expect:
+    :param vtk_compare:
+    :return:
+    '''
+    list_errors = []
+
+    def _aux_add_error(array_exp, array_cmp, msg, list_errors):
+        if array_exp is None or array_cmp is None:
+            return list_errors
+        aux_errors = _compare_vtkDataArray(array_exp, array_cmp)
+        if aux_errors:
+            aux_errors.insert(0, 'The {} array of vtkPointData are different.'.format(msg))
+            return list_errors + aux_errors
+
+    # Scalars
+    list_errors = _aux_add_error(vtk_expect.GetScalars(), vtk_compare.GetScalars(), 'scalars', list_errors)
+
+    # Vectors
+    list_errors = _aux_add_error(vtk_expect.GetVectors(), vtk_compare.GetVectors(), 'vectors', list_errors)
+
+    # Texture Coordinates
+    list_errors = _aux_add_error(vtk_expect.GetTCoords(), vtk_compare.GetTCoords(), 'texture coordinate', list_errors)
+
+    # Tensors
+    list_errors = _aux_add_error(vtk_expect.GetTensors(), vtk_compare.GetTensors(), 'tensors', list_errors)
+
+    # Global Ids
+    list_errors = _aux_add_error(vtk_expect.GetGlobalIds(), vtk_compare.GetGlobalIds(), 'global ids', list_errors)
+
+    # Normals
+    list_errors = _aux_add_error(vtk_expect.GetNormals(), vtk_compare.GetNormals(), 'normals', list_errors)
+
+    if vtk_expect.GetNumberOfArrays() != vtk_compare.GetNumberOfArrays():
+        list_errors.append('The number of arrays in each vtkPointData are different. Expected: {}, '
+                           'received: {}'.format(vtk_expect.GetNumberOfArrays(), vtk_compare.GetNumberOfArrays()))
+    else:
+        for i in range(vtk_expect.GetNumberOfArrays()):
+            aux_errors = _compare_vtkAbstractArray(vtk_expect.GetAbstractArray(i), vtk_compare.GetAbstractArray(i),
+                                                                        'position array {} of vtkPointData'.format(i))
+            if aux_errors:
+                list_errors = list_errors + aux_errors
+
+    if vtk_expect.GetNumberOfTuples() != vtk_compare.GetNumberOfTuples():
+        list_errors.append('The number of tuples of the vtkPointData are different. Expected: {}, '
+                           'received: {}'.format(vtk_expect.GetNumberOfTuples(), vtk_compare.GetNumberOfTuples()))
+
+    if vtk_expect.GetNumberOfComponents() != vtk_compare.GetNumberOfComponents():
+        list_errors.append('The number of components of the vtkPointData are different. Expected: {}, '
+                            'received: {}'.format(vtk_expect.GetNumberOfComponents(), vtk_compare.GetNumberOfComponents()))
+    return list_errors
+
+
+def _compare_vtkStringArray(vtk_expect, vtk_compare):
+    '''
+    Verify if the two vtkStringArrays are equal
+    :param vtk_expect:
+    :param vtk_compare:
+    :return:
+    '''
+    list_errors = []
+
+    if vtk_expect.GetNumberOfComponents() != vtk_compare.GetNumberOfComponents():
+        list_errors.append('The number of components of the vtkStringArray are different. Expected: {}, '
+                            'received: {}'.format(vtk_expect.GetNumberOfComponents(), vtk_compare.GetNumberOfComponents()))
+
+
+    if vtk_expect.GetDataSize() != vtk_compare.GetDataSize():
+        list_errors.append('The data size of the vtkStringArray are different. Expected: {}, '
+                            'received: {}'.format(vtk_expect.GetDataSize(), vtk_compare.GetDataSize()))
+
+    aux_errors = _compare_vtkAbstractArray(vtk_expect, vtk_compare, 'vtkStringArray')
+    if aux_errors:
+        list_errors = list_errors + aux_errors
+
+    return list_errors
+
+
+def _compare_vtkAbstractArray(vtk_expect, vtk_compare, type):
+    '''
+    Verify if the basic attributes of the vtkAbstractArray are equal
+    :param vtk_expect:
+    :param vtk_compare:
+    :param type: The vtk type object
+    :return:
+    '''
+    list_errors = []
+
+    if vtk_expect.GetNumberOfTuples() != vtk_compare.GetNumberOfTuples():
+        list_errors.append('The number of tuples of the {} are different. Expected: {}, '
+                            'received: {}'.format(type, vtk_expect.GetNumberOfTuples(), vtk_compare.GetNumberOfTuples()))
+
+    if vtk.vtkVersion().GetVTKMajorVersion() > 7 or vtk.vtkVersion().GetVTKVersion() == '7.1.1' and \
+       vtk_expect.GetNumberOfValues() != vtk_compare.GetNumberOfValues():
+        list_errors.append('The number of values of the {} are different. Expected: {}, '
+                            'received: {}'.format(type, vtk_expect.GetNumberOfValues(), vtk_compare.GetNumberOfValues()))
+
+    if vtk_expect.GetSize() != vtk_compare.GetSize():
+        list_errors.append('The size of the {} are different. Expected: {}, '
+                            'received: {}'.format(type, vtk_expect.GetSize(), vtk_compare.GetSize()))
+
+    if vtk_expect.GetMaxId() != vtk_compare.GetMaxId():
+        list_errors.append('The maximum id of the {} are different. Expected: {}, '
+                            'received: {}'.format(type, vtk_expect.GetMaxId(), vtk_compare.GetMaxId()))
+
+    if vtk_expect.GetArrayType() != vtk_compare.GetArrayType():
+        list_errors.append('The array type of the {} are different. Expected: {}, '
+                            'received: {}'.format(type, vtk_expect.GetArrayType(), vtk_compare.GetArrayType()))
+
+    if vtk_expect.GetName() != vtk_compare.GetName():
+        list_errors.append('The array name of the {} are different. Expected: {}, '
+                            'received: {}'.format(type, vtk_expect.GetName(), vtk_compare.GetName()))
+
+    if vtk_expect.GetMaxDiscreteValues() != vtk_compare.GetMaxDiscreteValues():
+        list_errors.append('The maximum discrete values of the {} are different. Expected: {}, '
+                           'received: {}'.format(type, vtk_expect.GetMaxDiscreteValues(), vtk_compare.GetMaxDiscreteValues()))
+
+    return list_errors
+
