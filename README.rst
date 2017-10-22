@@ -37,13 +37,13 @@ Support for testing vtk objects such as:
 * vtkPointData
 * vtkCharArray
 * vtkStringArray
+* vtkStructuredGrid
 
 
 To Do
 ----
 * Support to test:
     * vtkSignedCharArray
-    * vtkStructuredGrid
     * vtkUnstructuredGrid
     * vtkPolyData
     * vtkImageData

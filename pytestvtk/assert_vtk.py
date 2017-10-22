@@ -123,26 +123,6 @@ def _compare_vtkStructuredGrid(vtk_expect, vtk_compare):
     '''
     list_errors = []
 
-    exp_points = ns.vtk_to_numpy(vtk_expect.GetPoints().GetData())
-    exp_scalars = ns.vtk_to_numpy(vtk_expect.GetPointData().GetScalars())
-    exp_ghost = None
-
-    if vtk_expect.GetPointGhostArray():
-        exp_ghost = ns.vtk_to_numpy(vtk_expect.GetPointGhostArray())
-
-    cmp_points = ns.vtk_to_numpy(vtk_compare.GetPoints().GetData())
-    cmp_scalars = ns.vtk_to_numpy(vtk_compare.GetPointData().GetScalars())
-    cmp_ghost = None
-
-    if vtk_compare.GetPointGhostArray():
-        cmp_ghost = ns.vtk_to_numpy(vtk_compare.GetPointGhostArray())
-
-
-    if not(cmp_ghost is None or exp_ghost is None):
-        aux_erros = _compare_vtkDataArray(exp_ghost, cmp_ghost)
-        if aux_erros:
-            list_errors.append(aux_erros)
-
     if vtk_expect.GetNumberOfPoints() != vtk_compare.GetNumberOfPoints():
         list_errors.append('The number of points are different. Expected: {}, received: '
                            '{}'.format(vtk_expect.GetNumberOfPoints(), vtk_compare.GetNumberOfPoints()))
@@ -151,38 +131,21 @@ def _compare_vtkStructuredGrid(vtk_expect, vtk_compare):
         list_errors.append('The dimensions are different. Expected: {}, received: '
                            '{}'.format(vtk_expect.GetDimensions(), vtk_compare.GetDimensions()))
 
-    if vtk_expect.GetPoints().GetData().GetName() != vtk_compare.GetPoints().GetData().GetName():
-        list_errors.append('The name of the points data structure  are different. '
-                           'Expected: {} , Received: {}'.format(vtk_expect.GetPoints().GetData().GetName(),
-                                                                vtk_compare.GetPoints().GetData().GetName()))
+    if vtk_expect.GetNumberOfCells() != vtk_compare.GetNumberOfCells():
+        list_errors.append('The number of cells are different. Expected: {}, received: '
+                           '{}'.format(vtk_expect.GetNumberOfCells(), vtk_compare.GetNumberOfCells()))
 
-    try:
-        nt.assert_array_equal(exp_points, cmp_points)
-    except AssertionError as msg:
-        list_errors.append('The vtkStructuredGrid points compared are not equal. \n'
-                           '{}'.format(msg.message))
+    exp_points = vtk_expect.GetPoints()
+    exp_point_data = vtk_expect.GetPointData()
 
-    if vtk_expect.GetPointData().GetScalars().GetName() != vtk_compare.GetPointData().GetScalars().GetName():
-        list_errors.append('The name of the scalars data structure  are different. '
-                           'Expected: {} , Received: {}'.format(vtk_expect.GetPointData().GetScalars().GetName(),
-                                                                vtk_compare.GetPointData().GetScalars().GetName()))
+    cmp_points = vtk_compare.GetPoints()
+    cmp_point_data = vtk_compare.GetPointData()
 
-    try:
-        nt.assert_array_equal(exp_scalars, cmp_scalars)
-    except AssertionError as msg:
-        list_errors.append('The vtkStructuredGrid scalars compared are not equal. \n'
-                           '{}'.format(msg.message))
+    list_errors = list_errors + _compare_vtkDataArray(vtk_expect.GetPointGhostArray(), vtk_compare.GetPointGhostArray())
 
-    if not (exp_ghost is None and cmp_ghost is None) and \
-            vtk_expect.GetPointGhostArray().GetName() != vtk_compare.GetPointGhostArray().GetName():
-        list_errors.append('The name of the ghost data structure are different. '
-                           'Expected: {} , Received: {}'.format(vtk_expect.GetPointGhostArray().GetName(),
-                                                                vtk_compare.GetPointGhostArray().GetName()))
-    try:
-        nt.assert_array_equal(exp_ghost, cmp_ghost)
-    except AssertionError as msg:
-        list_errors.append('The vtkStructuredGrid ghost array compared are not equal. \n'
-                           '{}'.format(msg.message))
+    list_errors = list_errors + _compare_vtkPoints(exp_points, cmp_points)
+
+    list_errors = list_errors + _compare_vtkPointData(exp_point_data, cmp_point_data)
 
     return list_errors
 
@@ -221,31 +184,33 @@ def _compare_vtkPointData(vtk_expect, vtk_compare):
     '''
     list_errors = []
 
-    def _aux_add_error(array_exp, array_cmp, msg, list_errors):
+    def _aux_add_error(array_exp, array_cmp, msg):
         if array_exp is None or array_cmp is None:
-            return list_errors
+            return []
         aux_errors = _compare_vtkDataArray(array_exp, array_cmp)
         if aux_errors:
             aux_errors.insert(0, 'The {} array of vtkPointData are different.'.format(msg))
-            return list_errors + aux_errors
+            return aux_errors
+        else:
+            return []
 
     # Scalars
-    list_errors = _aux_add_error(vtk_expect.GetScalars(), vtk_compare.GetScalars(), 'scalars', list_errors)
+    list_errors = list_errors + _aux_add_error(vtk_expect.GetScalars(), vtk_compare.GetScalars(), 'scalars')
 
     # Vectors
-    list_errors = _aux_add_error(vtk_expect.GetVectors(), vtk_compare.GetVectors(), 'vectors', list_errors)
+    list_errors = list_errors + _aux_add_error(vtk_expect.GetVectors(), vtk_compare.GetVectors(), 'vectors')
 
     # Texture Coordinates
-    list_errors = _aux_add_error(vtk_expect.GetTCoords(), vtk_compare.GetTCoords(), 'texture coordinate', list_errors)
+    list_errors = list_errors + _aux_add_error(vtk_expect.GetTCoords(), vtk_compare.GetTCoords(), 'texture coordinate')
 
     # Tensors
-    list_errors = _aux_add_error(vtk_expect.GetTensors(), vtk_compare.GetTensors(), 'tensors', list_errors)
+    list_errors = list_errors + _aux_add_error(vtk_expect.GetTensors(), vtk_compare.GetTensors(), 'tensors')
 
     # Global Ids
-    list_errors = _aux_add_error(vtk_expect.GetGlobalIds(), vtk_compare.GetGlobalIds(), 'global ids', list_errors)
+    list_errors = list_errors + _aux_add_error(vtk_expect.GetGlobalIds(), vtk_compare.GetGlobalIds(), 'global ids')
 
     # Normals
-    list_errors = _aux_add_error(vtk_expect.GetNormals(), vtk_compare.GetNormals(), 'normals', list_errors)
+    list_errors = list_errors + _aux_add_error(vtk_expect.GetNormals(), vtk_compare.GetNormals(), 'normals')
 
     if vtk_expect.GetNumberOfArrays() != vtk_compare.GetNumberOfArrays():
         list_errors.append('The number of arrays in each vtkPointData are different. Expected: {}, '
