@@ -9,6 +9,10 @@ pytest-vtk
 .. image:: https://ci.appveyor.com/api/projects/status/github/marcelotrevisani/pytest-vtk?branch=master
     :target: https://ci.appveyor.com/project/marcelotrevisani/pytest-vtk/branch/master
     :alt: See Build Status on AppVeyor
+    
+.. image:: https://coveralls.io/repos/github/marcelotrevisani/pytest-vtk/badge.svg?branch=master
+    :target: https://coveralls.io/github/marcelotrevisani/pytest-vtk?branch=master
+
 
 It's a plugin for pytest to easily test the VTK objects from VTK library
 
