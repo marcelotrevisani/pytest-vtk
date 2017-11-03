@@ -13,7 +13,7 @@ def read(fname):
 
 setup(
     name='pytest-vtk',
-    packages='pytestvtk',
+    packages=['pytestvtk'],
     version='0.1.0',
     author='Marcelo Duarte Trevisani',
     author_email='marceloduartetrevisani@gmail.com',
