@@ -5,7 +5,7 @@ language: python
 env:
   global:
       # used by ci-helpers
-    - CONDA_CHANNELS=conda-forge SETUP_XVFB=true  DEPS="pytest tox numpy vtk"
+    - CONDA_CHANNELS=conda-forge SETUP_XVFB=true  DEPS="pytest numpy vtk"
   matrix:
       include:
         - python: 2.7
@@ -28,9 +28,6 @@ install:
   - git clone --depth 1 git://github.com/astropy/ci-helpers.git
   - CONDA_DEPENDENCIES="${DEPS} " source ci-helpers/travis/setup_conda.sh
   - source activate test && pip install -e .
-
-script:
-  - tox -e $PYTESTVTK_ENV
 
 before_cache:
   - rm -rf $HOME/.cache/pip/log
