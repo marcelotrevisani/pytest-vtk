@@ -5,7 +5,7 @@ language: python
 env:
   global:
       # used by ci-helpers
-    - CONDA_CHANNELS=conda-forge SETUP_XVFB=true  DEPS="pytest numpy vtk"
+    - CONDA_CHANNELS=conda-forge SETUP_XVFB=true  DEPS="pytest tox numpy vtk"
   matrix:
       include:
         - python: 2.7
