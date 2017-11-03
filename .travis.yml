@@ -36,7 +36,7 @@ script:
   - source activate test && catchsegv coverage run --source=pytestqt -m pytest -v tests
   - |
    chmod u+x /home/travis/miniconda/envs/test/bin/tox
-   /home/travis/miniconda/envs/test/bin/tox -e 
+   /home/travis/miniconda/envs/test/bin/tox
 
 cache:
   directories:
