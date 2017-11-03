@@ -26,7 +26,6 @@ env:
 install:
   # Setup miniconda
   - git clone --depth 1 git://github.com/astropy/ci-helpers.git
-  - conda search vtk
   - CONDA_DEPENDENCIES="${DEPS} " source ci-helpers/travis/setup_conda.sh
   - conda search vtk
   - source activate test && pip install -e .
